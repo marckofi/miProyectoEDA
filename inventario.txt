@@ -1,0 +1,4 @@
+Paletas,45612,0.50,10
+Tambores,12345,2.50,10
+Picafresas,668,1.00,10
+Chicles,78945,0.50,10
