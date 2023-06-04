@@ -187,37 +187,14 @@ int main(){
 
     mostrarMenu(lista_productos, cola_pedidos);
 
-    //Probaremos buscar nodo Por ID
-/*
-    int id_buscada=0; 
-
-    Producto * producto_encontrado =NULL; 
-
-    int pregunta =1; 
-    while(pregunta==1){
-
-        do{
-            leerEntero("\n Ingresa la id del producto que quieres buscar: ", &id_buscada);
-            producto_encontrado= buscarNodoPorId(lista_productos, id_buscada); 
-
-        }while(producto_encontrado==NULL);
-
-        printf("\n Este es el producto que se encontro: "); 
-        imprimirProducto(*producto_encontrado);
-
-
-
-        leerEntero("1. Seguir 2. Salir", &pregunta);
-    }
-    
-*/
+   
 
 
     guardarInventario(lista_productos);
 
-
-
+    //Liberar espacio del inventario.
     eliminarListaD(lista_productos);
+    eliminarColaPedidos(cola_pedidos);
 
 
 
@@ -986,7 +963,6 @@ void eliminarColaPedidos(lista_doble * cola_pedidos){
 
         //pedido = (lista_doble*) actual->info;
         //eliminarListaD(pedido);
-
 
         eliminarListaD(actual->info);
         free(actual);
