@@ -107,8 +107,10 @@ void eliminarColaPedidos(lista_doble * cola_pedidos);
 /*Función para evaluar si hay existencia de al menos un producto. 
 Retornara valor entero equivalente a verdadero si hay al menos un producto que tenga más de 0 existencias. 
 */
-
 int existenciaInventario(lista_doble * lista_productos);
+
+//Imprime de que productos ya no hay existencia
+void imprimirNoExistencia(lista_doble * lista_productos);
 
 void mostrarMenu(lista_doble * lista_productos, lista_doble * cola_pedidos);
 void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_pedidos);
@@ -681,14 +683,16 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
         
 
         do{
-            /*
+            
+            imprimirNoExistencia(lista_productos);
+
             if(producto_pedido_lista==NULL){
                 printf("\nIngresa un valor valido de ID: ");
-            }else if(producto_pedido_lista->cantidad == 0){
-                printf("\n Ya no tenemos existencias del producto con ID %d", id_producto_pedido);
             }
-            */
-        
+
+            // Añadiremos funcion para que muestre de que productos ya no hay existencia
+
+            
             leerEntero("\n Ingresa el ID del producto que quieres agregar: ", &id_producto_pedido);
             producto_pedido_lista = buscarNodoPorId(lista_productos, id_producto_pedido);  // Producto que se quiere comprar. 
     
@@ -702,23 +706,39 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
 
         do{
 
-            if(cantidad_producto_pedido <= 0 || cantidad_producto_pedido > producto_pedido_lista->cantidad){
+            if(cantidad_producto_pedido < 0 || cantidad_producto_pedido > producto_pedido_lista->cantidad){
                 printf("\n Ingresa una cantidad valida");
             }
             leerEntero("\n Escribe la cantidad que quieres de ese producto: ", &cantidad_producto_pedido);
 
 
-        }while(cantidad_producto_pedido > producto_pedido_lista->cantidad );
+        }while(cantidad_producto_pedido > producto_pedido_lista->cantidad || cantidad_producto_pedido<0 );
 
-        producto_pedido_lista->cantidad = producto_pedido_lista->cantidad - cantidad_producto_pedido; //Restamos la cantidad 
 
-        producto_pedido = crearProducto();  // Producto cola es el que se añadirá a cada pedido. 
+        /* Es posible que el usuario se haya equivocado de producto entonces está la opcion de agregar cantidad 0. 
+            Lo que significa que no se añadirá nada al pedido.
+        */
+        if(cantidad_producto_pedido > 0){
+            producto_pedido_lista->cantidad = producto_pedido_lista->cantidad - cantidad_producto_pedido; //Restamos la cantidad 
 
-        llenarProducto(producto_pedido, producto_pedido_lista->nombre, producto_pedido_lista->precio, cantidad_producto_pedido, id_producto_pedido);
+            producto_pedido = crearProducto();  // Producto cola es el que se añadirá a cada pedido. 
 
-        agregarFinalLD(pedido, producto_pedido);
+            llenarProducto(producto_pedido, producto_pedido_lista->nombre, producto_pedido_lista->precio, cantidad_producto_pedido, id_producto_pedido);
+
+            agregarFinalLD(pedido, producto_pedido);
+
+
+        }
+
 
         leerEntero("1. Agregar otro producto.\n2. Salir\n", &pregunta); 
+    }
+
+    /*Es posible que aqui llegue un pedido vacio pues si el usuario ingresa puro 0 entonces no se añadirá nada a la lista pedido*/
+
+    if(listaVacia(pedido)){
+        printf("\n --- No se realizo ningun pedido --- \n");
+        return;
     }
 
     strcpy(pedido->nombre, nombre_pedido);
@@ -1016,6 +1036,28 @@ int existenciaInventario(lista_doble * lista_productos){
     return 0;
     
 }
+
+void imprimirNoExistencia(lista_doble * lista_productos){
+
+    if(listaVacia(lista_productos)){
+        printf("\n--- La lista esta vacia---\n");
+    }
+
+
+    nodo_doble* actual = lista_productos->head;
+
+    while (actual != NULL) {
+        Producto* producto = (Producto*)actual->info;
+
+        if(producto->cantidad == 0){
+
+            printf("\n Ya no hay existencias de %s con ID : %d", producto->nombre, producto->id);
+        }
+        actual = actual->next;
+    }
+    
+}
+
 
 
 void guardarInventario(lista_doble * lista_productos) {
