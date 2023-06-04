@@ -18,6 +18,8 @@ lista Vacia se usará como isEmpty.
 
  //Checa si no es necesario hacer el cast a lista_doble * cuando liberas el campo info de uno nodo de la cola de pedidos.
 
+Revisar los fflush stdin , en especial en la funcion agregarPedido.
+
 
 */
 
@@ -102,6 +104,12 @@ En el campo  de los nodos se almacena una lista_doble la cual representa un pedi
 void eliminarColaPedidos(lista_doble * cola_pedidos);
 //Funciones para el menu y para leer entrada desde el teclado. 
 
+/*Función para evaluar si hay existencia de al menos un producto. 
+Retornara valor entero equivalente a verdadero si hay al menos un producto que tenga más de 0 existencias. 
+*/
+
+int existenciaInventario(lista_doble * lista_productos);
+
 void mostrarMenu(lista_doble * lista_productos, lista_doble * cola_pedidos);
 void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_pedidos);
 void mostrarSubMenuPedido(lista_doble * cola_pedidos);
@@ -133,7 +141,7 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos);
 
 void liberarPedido();
 
-void verColasPedido();
+void verColaPedidos();
 
 void registrarVentas();
 
@@ -178,6 +186,31 @@ int main(){
     
 
     mostrarMenu(lista_productos, cola_pedidos);
+
+    //Probaremos buscar nodo Por ID
+/*
+    int id_buscada=0; 
+
+    Producto * producto_encontrado =NULL; 
+
+    int pregunta =1; 
+    while(pregunta==1){
+
+        do{
+            leerEntero("\n Ingresa la id del producto que quieres buscar: ", &id_buscada);
+            producto_encontrado= buscarNodoPorId(lista_productos, id_buscada); 
+
+        }while(producto_encontrado==NULL);
+
+        printf("\n Este es el producto que se encontro: "); 
+        imprimirProducto(*producto_encontrado);
+
+
+
+        leerEntero("1. Seguir 2. Salir", &pregunta);
+    }
+    
+*/
 
 
     guardarInventario(lista_productos);
@@ -569,16 +602,29 @@ void actualizarInventario(lista_doble * lista_productos) {
     }
 
     int nueva_cantidad=0; 
-    float nuevo_precio =0; //Aqui duda. Se puede inicializar en 0 o debe de ser 0.0?
+    float nuevo_precio =1; //Aqui duda. Se puede inicializar en 0 o debe de ser 0.0?
 
     printf("\n El producto que quieres cambiar es: \n"); 
     imprimirProducto(*producto_cambiar);
 
-    printf("\n Ingresa la nueva cantidad del producto con ID %d: ", id_cambiar);
-    leerEntero("", &nueva_cantidad);
+    do{
+        if(nueva_cantidad < 0){
+            printf("\n Ingresa un valor valido.");
+        }
+        printf("\n Ingresa la nueva cantidad del producto con ID %d: ", id_cambiar);
+        leerEntero("", &nueva_cantidad);
 
-    printf("\n Ingresa el nuevo precio  del producto con ID %d: ", id_cambiar);
-    leerFloat("", &nuevo_precio);
+
+    }while(nueva_cantidad < 0);
+
+
+    do{
+        if(nuevo_precio <= 0){
+            printf("\n Ingresa un valor valido.");
+        }
+         printf("\n Ingresa el nuevo precio  del producto con ID %d: ", id_cambiar);
+        leerFloat("", &nuevo_precio);
+    }while(nuevo_precio <=  0);
 
     actualizarProducto(producto_cambiar, nueva_cantidad, nuevo_precio);
 
@@ -628,12 +674,21 @@ void buscarInventario() {
 
 void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
     printf("Opcion: Agregar Pedido\n");
+
+    if(existenciaInventario(lista_productos) == 0){
+        printf("\n \n--- Ya no hay existencias de ningun producto \n\n");
+        return;
+    }
     char nombre_pedido[50]; 
     int id_producto_pedido=0; 
     int cantidad_producto_pedido=0;
 
     lista_doble * pedido = crearListaDoble(); 
-    leerCadena("\nIngresa el nombre del pedido : ", nombre_pedido, 50); 
+
+    fflush(stdin);
+    printf("\n Ingrese el nombre de su pedido: ");
+    fgets(nombre_pedido, sizeof(nombre_pedido), stdin);
+
 
     Producto * producto_pedido= NULL;
     Producto *  producto_pedido_lista=  (Producto *)lista_productos->head->info ; //Solo es para inicializarlo en algun valor.
@@ -642,33 +697,41 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
 
     while(pregunta ==1){
 
-        producto_pedido_lista = NULL;
+        if(existenciaInventario(lista_productos) == 0){
+            printf("\n\n --- Ya no hay existencias de ningun producto \n\n");
+            break;
+        }
+        
+
         do{
-
+            /*
             if(producto_pedido_lista==NULL){
-                printf("\nIngresa un valor valido de ID. ");
-            }
-
-            if(producto_pedido_lista->cantidad == 0){
+                printf("\nIngresa un valor valido de ID: ");
+            }else if(producto_pedido_lista->cantidad == 0){
                 printf("\n Ya no tenemos existencias del producto con ID %d", id_producto_pedido);
-
             }
+            */
+        
             leerEntero("\n Ingresa el ID del producto que quieres agregar: ", &id_producto_pedido);
-            Producto * producto_pedido_lista = buscarNodoPorId(lista_productos, id_producto_pedido);  // Producto que se quiere comprar. 
+            producto_pedido_lista = buscarNodoPorId(lista_productos, id_producto_pedido);  // Producto que se quiere comprar. 
     
         }while(producto_pedido_lista==NULL || producto_pedido_lista->cantidad==0);
 
-    cantidad_producto_pedido=1;
+        cantidad_producto_pedido=1;
+
+        printf("\n Este es el producto que quieres agregar");
+
+        imprimirProducto(*producto_pedido_lista);
 
         do{
 
             if(cantidad_producto_pedido <= 0 || cantidad_producto_pedido > producto_pedido_lista->cantidad){
                 printf("\n Ingresa una cantidad valida");
             }
-            leerEntero("\n Escribe la cantidad que quieres de ese producto ", &cantidad_producto_pedido);
+            leerEntero("\n Escribe la cantidad que quieres de ese producto: ", &cantidad_producto_pedido);
 
 
-        }while(cantidad_producto_pedido > producto_pedido_lista->cantidad || cantidad_producto_pedido<=0);
+        }while(cantidad_producto_pedido > producto_pedido_lista->cantidad );
 
         producto_pedido_lista->cantidad = producto_pedido_lista->cantidad - cantidad_producto_pedido; //Restamos la cantidad 
 
@@ -678,8 +741,10 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
 
         agregarFinalLD(pedido, producto_pedido);
 
-        leerEntero("1. Agregar otro producto. \n 2. Salir\n", &pregunta); 
+        leerEntero("1. Agregar otro producto.\n2. Salir\n", &pregunta); 
     }
+
+    strcpy(pedido->nombre, nombre_pedido);
     agregarFinalLD(cola_pedidos,pedido);
 }
 
@@ -687,7 +752,7 @@ void liberarPedido() {
     printf("Opcion: Liberar Pedido\n");
 }
 
-void verColasPedido() {
+void verColaPedidos() {
     printf("Opcion: Ver Colas de Pedido\n");
 }
 
@@ -837,9 +902,10 @@ void leerEntero(char prompt[], int *k){
         if (prueba ==0 ) {
             printf("\nIngrese un dato valido: ");
         }
-        fflush(stdin);
 
         prueba = scanf("%d", k);
+        fflush(stdin);
+
     } while (prueba == 0);
     
 }
@@ -946,14 +1012,35 @@ void imprimirColaPedidos(lista_doble * cola_pedidos){
     while (actual != NULL) {
         lista_doble* pedido = (lista_doble*)actual->info;
         printf("\n Pedido %d", k); 
-        printf("\n Nombre: %s",pedido->nombre );
+        printf("\n Nombre pedido: %s",pedido->nombre );
         imprimirListaDProducto(pedido);
         actual = actual->next;
+        k++;
     }
 
-
-
 }
+
+int existenciaInventario(lista_doble * lista_productos){
+
+    if(listaVacia(lista_productos)){
+        printf("\n--- La lista esta vacia---\n");
+        return 0;
+    }
+
+    nodo_doble* actual = lista_productos->head;
+
+    while (actual != NULL) {
+        Producto* producto = (Producto*)actual->info;
+        
+        if(producto->cantidad >= 1){
+            return 1;
+        }
+        actual = actual->next;
+    }
+    return 0;
+    
+}
+
 
 void guardarInventario(lista_doble * lista_productos) {
     FILE* archivo = fopen("inventario.txt", "w");
