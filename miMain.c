@@ -47,6 +47,7 @@ typedef struct nodo_doble {
 typedef struct lista_doble {
     struct nodo_doble * head;
     struct nodo_doble * tail;
+    char nombre[50];
     int size;
 }lista_doble;
 
@@ -113,6 +114,8 @@ void leerEntero(char prompt[], int *k);
 void leerFloat(char prompt[], float *f);
 void leerEnteroRango(char prompt[], int* k, int min, int max); 
 
+void leerCadena(char prompt[], char cadena[], int longitud);
+
 
 
 
@@ -128,7 +131,7 @@ void quitarProducto(lista_doble * lista_productos);
 
 void buscarInventario();
 
-void agregarPedido();
+void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos);
 
 void liberarPedido();
 
@@ -160,10 +163,17 @@ int main(){
     agregarInicioLD(lista_productos, paletas); 
 
     
-*/
-    
+*/  
 
+
+    
+    lista_doble * cola_pedidos = crearListaDoble();
     lista_doble *lista_productos = cargarInventario();
+
+    strcpy(lista_productos->nombre, "Lista productos" );
+    strcpy(lista_productos->nombre, "Cola pedido" );
+
+
 
     
     imprimirListaDProducto(lista_productos);
@@ -191,6 +201,9 @@ lista_doble * crearListaDoble(){
     listaD->head =NULL; 
     listaD->tail=NULL; 
     listaD->size=0;
+
+    strcpy(listaD->nombre, "");
+    
     return listaD;
 
 
@@ -534,19 +547,6 @@ void actualizarProducto(Producto * producto, int nueva_cantidad, float nuevo_pre
 
 
 
-void leerEnteroRango(char prompt[], int* k, int min, int max) {
-    int prueba = 1;
-    printf("%s", prompt);
-    
-    do {
-        if (prueba == 0 || *k < min || *k > max) {
-            printf("\nIngrese un dato valido entre %d y %d: ", min, max);
-        }
-
-        prueba = scanf("%d", k);
-        fflush(stdin);
-    } while (prueba == 0 || *k < min || *k > max);
-}
 
 
 // Funciones para las opciones del menú
@@ -629,8 +629,57 @@ void buscarInventario() {
     printf("Opcion: Buscar en Inventario\n");
 }
 
-void agregarPedido() {
+void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
     printf("Opcion: Agregar Pedido\n");
+    char nombre_pedido[50]; 
+    int id_producto_pedido=0; 
+    int cantidad_producto_pedido=0;
+
+    lista_doble * pedido = crearListaDoble(); 
+    leerCadena("\nIngresa el nombre del pedido : ", nombre_pedido, 50); 
+
+    Producto * producto_cola= NULL;
+
+    Producto *  producto_pedido_lista=  lista_productos->head->info ; //Solo es para inicializarlo en algun valor.
+    do{
+
+        if(producto_pedido_lista==NULL){
+            printf("\nIngresa un valor valido de ID");
+        }
+        leerEntero("\n Ingresa el ID del producto que quieres agregar: ", &id_producto_pedido);
+        Producto * producto_pedido_lista = buscarNodoPorId(lista_productos, id_producto_pedido);  // Producto que se quiere comprar. 
+    
+    }while(producto_pedido_lista==NULL);
+
+    cantidad_producto_pedido=1;
+
+    do{
+
+        if(cantidad_producto_pedido <= 0 || cantidad_producto_pedido > producto_pedido->cantidad){
+            printf("\n Ingresa una cantidad valida");
+        }
+        leerEntero("\n Escribe la cantidad que quieres de ese producto ", &cantidad_producto_pedido);
+
+
+    }while(cantidad_producto_pedido > producto_pedido->cantidad || cantidad_producto_pedido<=0);
+
+    producto_pedido_lista->cantidad = producto_pedido_lista->cantidad - cantidad_producto_pedido; //Restamos la cantidad 
+
+    producto_pedido = crearProducto();  // Producto cola es el que se añadirá a cada pedido. 
+
+    llenarProducto(producto_pedido, producto_pedido_lista->nombre, producto_pedido_lista->precio, cantidad_producto_pedido, id_producto_pedido);
+
+    agregarFinalLD(pedido, producto_pedido);
+
+
+
+    agregarFinalLD(cola_pedidos,pedido);
+
+    
+
+
+
+
 }
 
 void liberarPedido() {
@@ -805,6 +854,36 @@ void leerFloat(char prompt[], float *f){
         fflush(stdin);
     } while (prueba == 0);
 }
+
+void leerCadena(char prompt[], char cadena[], int longitud) {
+    printf("%s", prompt);
+    fflush(stdout); // Vaciar el búfer de salida para mostrar el prompt inmediatamente
+
+    fgets(cadena, longitud, stdin);
+
+    // Eliminar el carácter de nueva línea si está presente
+    int longitudCadena = strlen(cadena);
+    if (longitudCadena > 0 && cadena[longitudCadena - 1] == '\n') {
+        cadena[longitudCadena - 1] = '\0';
+    }
+}
+
+
+void leerEnteroRango(char prompt[], int* k, int min, int max) {
+    int prueba = 1;
+    printf("%s", prompt);
+    
+    do {
+        if (prueba == 0 || *k < min || *k > max) {
+            printf("\nIngrese un dato valido entre %d y %d: ", min, max);
+        }
+
+        prueba = scanf("%d", k);
+        fflush(stdin);
+    } while (prueba == 0 || *k < min || *k > max);
+}
+
+
 
 
 
