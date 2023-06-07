@@ -47,8 +47,32 @@ typedef struct lista_doble {
 }lista_doble;
 
 
+//Estructuras de la pila de ventas.
+typedef struct Venta{
+    float total; 
+    lista_doble * id_pedido;
+}Venta;
+
+typedef struct PilaVentas {
+    int tope;           
+    struct Venta** pila;   
+    int max_tamanio;  //Tamaño maximo que puede tener la pila
+}pila_ventas;
 
 
+
+
+//Funciones para la pila de ventas
+
+pila_ventas * crearPila();
+int isFull(pila_ventas * pila);
+int isEmpty(pila_ventas * pila);
+int push(pila_ventas *pila_v, Venta * venta);
+void imprimirVentas(Venta * venta);
+void imprimirPilaVentas(pila_ventas * pila_v);
+
+float ObtenerTotalPedido(lista_doble * pedido);
+void eliminarPilaVentas(pila_ventas * pila_de_ventas);
 
 
 
@@ -122,10 +146,10 @@ int existenciaInventario(lista_doble * lista_productos);
 void imprimirNoExistencia(lista_doble * lista_productos);
 
 
-void mostrarMenu(lista_doble * lista_productos, lista_doble * cola_pedidos);
+void mostrarMenu(lista_doble * lista_productos, lista_doble * cola_pedidos, pila_ventas * pila_de_ventas);
 void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_pedidos);
-void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_productos);
-void mostrarSubMenuVentas();
+void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_productos, pila_ventas * pila_de_ventas);
+void mostrarSubMenuVentas(pila_ventas * pila_de_ventas);
 
 void leerEntero(char prompt[], int *k);
 
@@ -151,12 +175,11 @@ void buscarInventario(lista_doble * lista_productos);
 
 void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos);
 
-void liberarPedido();
+void liberarPedido(lista_doble * cola_pedidos, pila_ventas * pila_de_ventas);
 
 
 void registrarVentas();
 
-void verVentasRealizadas();
 
 
 //Funciones de ventas de Mariana. 
@@ -213,6 +236,7 @@ int main(){
    // lista_doble * pila_ventas = crearListaDoble();
     lista_doble * cola_pedidos = crearListaDoble();
     lista_doble *lista_productos = cargarInventario();
+    pila_ventas * pila_de_ventas = crearPila(); 
 
     strcpy(lista_productos->nombre, "Lista productos" );
     strcpy(lista_productos->nombre, "Cola pedido" );
@@ -223,7 +247,7 @@ int main(){
     imprimirListaDProducto(lista_productos);
     
 
-    mostrarMenu(lista_productos, cola_pedidos);
+    mostrarMenu(lista_productos, cola_pedidos, pila_de_ventas);
 
    
 
@@ -420,6 +444,7 @@ void imprimirListaDProducto(lista_doble* lista_d) {
 
     if(listaVacia(lista_d)){
         printf("\n--- La lista esta vacia---\n");
+        return;
     }
 
 
@@ -820,8 +845,47 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
 
 
 
-void liberarPedido() {
+void liberarPedido(lista_doble * cola_pedidos, pila_ventas * pila_de_ventas) {
     printf("Opcion: Liberar Pedido\n");
+
+    if(listaVacia(cola_pedidos)){
+
+        printf("\n --- La cola de pedidos esta vacia. No se puede liberar ningun pedido --- \n");
+        return;
+    }
+
+    nodo_doble * nodo_pedido_liberado=NULL;
+
+    Venta * venta = (Venta *)malloc(sizeof(Venta));
+
+    if(venta==NULL){
+        printf("\n --- No se pudo liberar el pedido --- \n");
+        return;
+    }
+
+    nodo_pedido_liberado= extraerInicioLD(cola_pedidos);
+
+    lista_doble * pedido_liberado= (lista_doble *) nodo_pedido_liberado->info;
+
+
+    venta->id_pedido = pedido_liberado; 
+    venta->total = ObtenerTotalPedido(pedido_liberado);
+
+    int prueba = push(pila_de_ventas, venta);
+
+    if(prueba == 0){
+        printf("\n--- No se pudo liberar el pedido --- \n");
+        free(venta);
+        agregarInicioLD(cola_pedidos, nodo_pedido_liberado);
+
+        return;
+    }
+
+    printf("\n --- Se ha liberado el pedido y se ha agregado a la pila de ventas:");
+    imprimirListaDProducto(pedido_liberado);
+    free(nodo_pedido_liberado);
+
+
 }
 
 
@@ -831,9 +895,6 @@ void registrarVentas() {
 
 
 
-void verVentasRealizadas() {
-    printf("Opcion: Ver Ventas Realizadas\n");
-}//Función para registrar una venta, ingresando el total de la venta 
 
 
 
@@ -887,7 +948,7 @@ void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_
     }
 }
 
-void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_productos) {
+void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_productos, pila_ventas * pila_de_ventas) {
     int opcion=0;
 
     while (1) {
@@ -900,6 +961,7 @@ void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_produc
         switch (opcion) {
             case 1:
                 printf("Opcion: Liberar Pedido\n");
+                liberarPedido(cola_pedidos, pila_de_ventas);
                 break;
             case 2:
                 printf("Opcion: Ver Colas de Pedido\n");
@@ -913,7 +975,7 @@ void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_produc
     }
 }
 
-void mostrarSubMenuVentas() {
+void mostrarSubMenuVentas(pila_ventas * pila_de_ventas) {
     int opcion=0;
 
     while (1) {
@@ -929,6 +991,7 @@ void mostrarSubMenuVentas() {
                 break;
             case 2:
                 printf("Opcion: Ver Ventas Realizadas\n");
+                imprimirPilaVentas(pila_de_ventas);
                 break;
             case 3:
                 printf("\nVolviendo al Menu Principal...\n");
@@ -938,7 +1001,7 @@ void mostrarSubMenuVentas() {
 }
 
 
-void mostrarMenu(lista_doble* lista_productos, lista_doble * cola_pedidos) {
+void mostrarMenu(lista_doble* lista_productos, lista_doble * cola_pedidos, pila_ventas * pila_de_ventas) {
     int opcion=0;
 
     while (1) {
@@ -954,10 +1017,10 @@ void mostrarMenu(lista_doble* lista_productos, lista_doble * cola_pedidos) {
                 mostrarSubMenuInventario(lista_productos, cola_pedidos);
                 break;
             case 2:
-                mostrarSubMenuPedido(cola_pedidos, lista_productos);
+                mostrarSubMenuPedido(cola_pedidos, lista_productos, pila_de_ventas);
                 break;
             case 3:
-                mostrarSubMenuVentas();
+                mostrarSubMenuVentas(pila_de_ventas);
                 break;
             case 4:
                 printf("\nSaliendo del programa...\n");
@@ -1079,6 +1142,7 @@ void imprimirColaPedidos(lista_doble * cola_pedidos){
 
     if(listaVacia(cola_pedidos)){
         printf("\n--- La cola de pedidos esta vacia---\n");
+        return;
     }
 
 
@@ -1186,12 +1250,108 @@ lista_doble* cargarInventario() {
 }
 
 
-typedef struct {
-    int tamano;         
-    int tope;           
-    Producto** pila;   
-} Ventas;
 
+pila_ventas * crearPila(){
+    pila_ventas * pila_v =(pila_ventas*) malloc(sizeof(pila_ventas));
+    pila_v->tope=-1;
+    pila_v->pila = (Venta **)malloc(sizeof(Venta*)*5);
+    pila_v->max_tamanio=5;
+    return pila_v;
+}
+
+//Retorna 1 si la pila esta llena y cero si no.
+int isFull(pila_ventas * pila){
+    if(pila->max_tamanio <= (pila->tope +1)){
+        return 1;
+    }
+    return 0;
+}
+
+int isEmpty(pila_ventas * pila){
+    return pila->tope == -1;
+}
+
+int push(pila_ventas *pila_v, Venta * venta) {
+    if (isFull(pila_v)) {
+        pila_v->max_tamanio = pila_v->max_tamanio +5; 
+        pila_v->pila = realloc(pila_v->pila, pila_v->max_tamanio * sizeof(Venta *));
+    }
+
+    //Verificar que se alla redimensionado.
+
+    if(pila_v->pila == NULL){
+        printf("\n--- No se pudo registrar otra venta --- \n");
+        return 0;
+    }
+
+    pila_v->tope++;
+    pila_v->pila[pila_v->tope] = venta;
+    return 1;
+}
+
+//Imprime una estrutura de venta. 
+
+void imprimirVenta(Venta * venta){
+    printf("\n Total de la venta= %.4f", venta->total);
+    printf("\n ID del pedido = %d \n", venta->id_pedido);
+}
+
+void imprimirPilaVentas(pila_ventas * pila_v){
+    if (isEmpty(pila_v)) {
+        printf("\n--- La pila de ventas  esta vacia --- \n");
+        return;
+    }
+
+    printf("\n Pila de ventas:\n");
+    for (int j =pila_v->tope; j >= 0; j--) {
+        printf("\n Venta %d", j+1 );
+        imprimirVenta(pila_v->pila[j]);
+    }
+}
+
+float ObtenerTotalPedido(lista_doble * pedido){
+
+    if(listaVacia(pedido)){
+        printf("\n--- La lista esta vacia---\n");
+    }
+
+    float total=0;
+
+    nodo_doble* actual = pedido->head;
+    Producto* producto=NULL;
+    while (actual != NULL) {
+         producto = (Producto*)actual->info;
+
+         total = total  + (producto->cantidad * producto->precio);
+        actual = actual->next;
+    }
+
+    return total;
+
+}
+
+void eliminarPilaVentas(pila_ventas * pila_de_ventas){
+
+    if (isEmpty(pila_de_ventas)) {
+        free(pila_de_ventas->pila);
+        free(pila_de_ventas);
+        return;
+    }
+
+    printf("\n Pila de ventas:\n");
+    for (int j =pila_de_ventas->tope; j >= 0; j--) {
+        eliminarFinalLD(pila_de_ventas->pila[j]->id_pedido);
+        free(pila_de_ventas->pila[j]);    
+    }
+
+    free(pila_de_ventas->pila);
+    free(pila_de_ventas);
+
+}
+
+
+
+/*
 void registrar_venta(Ventas* ventas, Producto* producto) {
     ventas->tope++;
     if (ventas->tope > ventas->tamano) {
@@ -1221,7 +1381,7 @@ void ver_ventas_realizadas(Ventas* ventas) {
 
 
 
-
+*/
 
 
  
