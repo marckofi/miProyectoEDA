@@ -6,13 +6,6 @@
 
 /*
 
-Crear función para imprimir inventario.
-AgregarInicioLD se usará como push a la hora de usar pilas.
-EliminarInicioLD se usará como pop a la hora de usar pilas.
-lista Vacia se usará como isEmpty. 
- ExtraerInicioLd se usará como top al implementar la cola. 
-
- Recuerda que al extraer un nodo, al finalizar tendrás que liberar tanto el nodo como su campo info.
 
  Modificar extrer inicio para que no vea tan fea. Usar variable de ayuda aux. 
 
@@ -21,11 +14,10 @@ lista Vacia se usará como isEmpty.
 Revisar los fflush stdin , en especial en la funcion agregarPedido.
 
 
-Quitar quitarProducto y agregarProducto
 
 */
 
-
+//Estructura del Producto
 typedef struct Producto{
     char nombre[30];
     float precio;
@@ -48,12 +40,13 @@ typedef struct lista_doble {
     int size;
 }lista_doble;
 
-
-//Estructuras de la pila de ventas.
+//Estructura para la ventas. La pila guardará direcciones de este tipo de estructuras.
 typedef struct Venta{
     float total; 
     lista_doble * id_pedido;
 }Venta;
+
+//Estructuras de la pila de ventas.
 
 typedef struct PilaVentas {
     int tope;           
@@ -69,7 +62,7 @@ typedef struct PilaVentas {
 pila_ventas * crearPila();
 int isFull(pila_ventas * pila);
 int isEmpty(pila_ventas * pila);
-int push(pila_ventas *pila_v, Venta * venta);
+int push(pila_ventas *pila_v, Venta * venta);//Retornará cero en caso de que no se haya podido redimensionar la pila.
 void imprimirVenta(Venta * venta);
 void imprimirPilaVentas(pila_ventas * pila_v);
 
@@ -88,40 +81,27 @@ void guardarInventario(lista_doble * lista_productos);
 //Función para cargar el inventario desde el archivo. 
 lista_doble* cargarInventario();
 
-
-lista_doble * crearListaDoble();
-
-
-int listaVacia(lista_doble  * lista);
-
-
 //Funciones de lista doble.
 
+
+lista_doble * crearListaDoble();
+int listaVacia(lista_doble  * lista); 
 void agregarInicioLD(lista_doble* lista_d, void * informacion);
 void agregarFinalLD(lista_doble * lista_d, void * informacion); 
-
-
 int eliminarInicioLD(lista_doble* lista_d); 
 int eliminarFinalLD(lista_doble* lista_d);
-
 nodo_doble * extraerInicioLD(lista_doble* lista_d);
 nodo_doble * extraerFinalLD(lista_doble* lista_d); 
-
-
-//Funciones para producto
-nodo_doble *  extraerEnMedioLDProductos(lista_doble * lista_d, int valor);
-
-
-void imprimirListaDProducto(lista_doble* lista_d);  //Imprimir lista doblemente ligada de productos.
 void eliminarListaD(lista_doble* lista_d);
 
+//Funciones para lista de productos.
+nodo_doble *  extraerEnMedioLDProductos(lista_doble * lista_d, int valor);
+void imprimirListaDProducto(lista_doble* lista_d);  //Imprimir lista doblemente ligada de productos.
 Producto * buscarNodoPorId(lista_doble* lista_d, int idBuscado);
-
 
 //Funciones para el producto.
 void llenarProducto(Producto * producto, char nombre[], float precio, int cantidad, int id); 
 void imprimirProducto(Producto p); 
-
 Producto * crearProducto(void); //Función que retorna una dirección que apunta a una structura Producto.
 
 
@@ -129,12 +109,8 @@ void actualizarProducto(Producto * producto, int nueva_cantidad, float nuevo_pre
 
 //Funciones para la cola de pedidos
 
-
-
 void imprimirColaPedidos(lista_doble * cola_pedidos); /*La cola de pedidos es una lista doblemente ligada implementada como cola. 
 En el campo  de los nodos se almacena una lista_doble la cual representa un pedido.*/
-
-
 
 void eliminarColaPedidos(lista_doble * cola_pedidos);
 //Funciones para el menu y para leer entrada desde el teclado. 
@@ -144,12 +120,13 @@ Retornara valor entero equivalente a verdadero si hay al menos un producto que t
 */
 int existenciaInventario(lista_doble * lista_productos);
 
-//Imprime de que productos ya no hay existencia
+//Imprime de qué productos ya no hay existencia
 void imprimirNoExistencia(lista_doble * lista_productos);
 
+//Funciones del menú.
 
 void mostrarMenu(lista_doble * lista_productos, lista_doble * cola_pedidos, pila_ventas * pila_de_ventas);
-void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_pedidos);
+void mostrarSubMenuInventario(lista_doble * lista_productos);
 void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_productos, pila_ventas * pila_de_ventas);
 void mostrarSubMenuVentas( lista_doble * lista_productos ,pila_ventas * pila_de_ventas);
 
@@ -158,11 +135,6 @@ void leerEntero(char prompt[], int *k);
 void leerFloat(char prompt[], float *f);
 void leerEnteroRango(char prompt[], int* k, int min, int max); 
 
-void leerCadena(char prompt[], char cadena[], int longitud);
-
-
-
-
 
 
 // Funciones para las opciones del menú
@@ -170,13 +142,11 @@ void verInventario(lista_doble * lista_productos);
 
 void actualizarInventario(lista_doble * lista_productos);
 
-
 void buscarInventario(lista_doble * lista_productos);
 
 void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos);
 
 void liberarPedido(lista_doble * cola_pedidos, pila_ventas * pila_de_ventas);
-
 
 void registrarVentas(lista_doble * lista_productos, pila_ventas * pila_v);
 
@@ -185,31 +155,6 @@ void registrarVentas(lista_doble * lista_productos, pila_ventas * pila_v);
 
 int main(){
     
-
-/*
-
-
-    Producto * tambores = crearProducto(); 
-    Producto * picafresas= crearProducto();
-    Producto * chicles= crearProducto();
-    Producto * paletas= crearProducto();
-
-    llenarProducto(tambores, "Tambores", 2.5, 10, 12345);
-    llenarProducto(picafresas, "Picafresas", 1, 10, 01234);
-    llenarProducto(chicles, "Chicles", 0.5, 10, 78945);
-    llenarProducto(paletas, "Paletas", 0.5, 10, 45612);
-
-    agregarFinalLD(lista_productos, tambores);
-    agregarFinalLD(lista_productos, picafresas);
-    agregarFinalLD(lista_productos, chicles);
-    agregarInicioLD(lista_productos, paletas); 
-
-    
-*/  
-
-
-
-   // lista_doble * pila_ventas = crearListaDoble();
     lista_doble * cola_pedidos = crearListaDoble();
     lista_doble *lista_productos = cargarInventario();
     pila_ventas * pila_de_ventas = crearPila(); 
@@ -217,27 +162,15 @@ int main(){
     strcpy(lista_productos->nombre, "Lista productos" );
     strcpy(lista_productos->nombre, "Cola pedido" );
 
-
-
-    
     imprimirListaDProducto(lista_productos);
     
-
     mostrarMenu(lista_productos, cola_pedidos, pila_de_ventas);
 
-   
-
-
     guardarInventario(lista_productos);
-
-
 
     eliminarListaD(lista_productos);
     eliminarColaPedidos(cola_pedidos);
     eliminarPilaVentas(pila_de_ventas);
-
-
-
 
     return 0; 
 }
@@ -246,7 +179,6 @@ int main(){
 lista_doble * crearListaDoble(){
 
     lista_doble * listaD = (lista_doble*)malloc(sizeof(lista_doble)); 
-
     listaD->head =NULL; 
     listaD->tail=NULL; 
     listaD->size=0;
@@ -254,8 +186,6 @@ lista_doble * crearListaDoble(){
     strcpy(listaD->nombre, "");
     
     return listaD;
-
-
 }
 
 //retorna entero con valor de verdadero si la lista está vacía.  
@@ -291,7 +221,6 @@ void agregarInicioLD(lista_doble * lista_d, void *informacion){
     lista_d->size += 1; //Agregamos 1 al control del tamaño de la lista.
 
 }
-
 
 
 //Agregar al final en una lista doblemente ligada. 
@@ -378,8 +307,7 @@ int eliminarFinalLD(lista_doble * lista_d){
 
 }
 
-
- 
+//Eliminar el inicio de una lista doble
 int eliminarInicioLD(lista_doble * lista_d){
 
     if(listaVacia(lista_d)){
@@ -415,12 +343,10 @@ int eliminarInicioLD(lista_doble * lista_d){
 //Imprimir lista de productos.
 void imprimirListaDProducto(lista_doble* lista_d) {
 
-
     if(listaVacia(lista_d)){
         printf("\n--- La lista esta vacia---\n");
         return;
     }
-
 
     nodo_doble*    actual = lista_d->head;
     Producto* producto=NULL;
@@ -430,12 +356,8 @@ void imprimirListaDProducto(lista_doble* lista_d) {
         actual = actual->next;
     }
     
-
-
 }
-
-
-
+//Función para extraer el nodo final de una lista de productos. Ojo que no lo elimina sino lo retorna. 
 nodo_doble * extraerFinalLD(lista_doble * lista_d){
     
     if(listaVacia(lista_d)){
@@ -472,7 +394,7 @@ nodo_doble * extraerFinalLD(lista_doble * lista_d){
 
 }
 
-
+//Extrae el nodo incio(head) de una lista doble. Ojo que no lo elimina sino lo retorna.
 nodo_doble* extraerInicioLD(lista_doble * lista_d){
 
     if(listaVacia(lista_d)){
@@ -505,7 +427,10 @@ nodo_doble* extraerInicioLD(lista_doble * lista_d){
     return aux;
 }
 
-// Para extraer nodos que sean productos 
+/* Para extraer el nodo con cierto producto con cierto ID de una lista doble sin importar su posicón. 
+La lista doble pasada a esta función debe de ser una lista donde sus nodos en su campo Info tengan la
+dirección de una estructura Producto
+*/
 nodo_doble *  extraerEnMedioLDProductos(lista_doble * lista_d, int id){
 
 
@@ -565,68 +490,67 @@ nodo_doble *  extraerEnMedioLDProductos(lista_doble * lista_d, int id){
 
 }
 
+//Función para llenar los campos de una estructura Producto. 
 void llenarProducto(Producto * producto, char nombre[], float precio, int cantidad, int id){
 
         producto->id=id; 
         producto->cantidad=cantidad; 
         producto->precio=precio;
-
         strcpy(producto->nombre, nombre); 
 
 }
 
-
+//Función para imprimir una estructura Producto.
 void imprimirProducto(Producto p){
     printf("\n Nombre: %s", p.nombre); 
     printf("\n Precio: %.4f", p.precio); 
     printf("\n Cantidad: %d", p.cantidad); 
     printf("\n ID: %d \n", p.id); 
-
-
 }
 
-Producto * crearProducto(void){
 
-    Producto * p = (Producto *)malloc(sizeof(Producto));
+//Función para crear una estructura Producto. Retorna dirección a estructura Producto.
+Producto * crearProducto(void){
+    Producto *p=NULL;
+    p = (Producto *)malloc(sizeof(Producto));
     return p;
 }
-
-
+//Actualiza  los campos cantidad y precio de una estructura Producto.
 void actualizarProducto(Producto * producto, int nueva_cantidad, float nuevo_precio){
 
     producto->cantidad= nueva_cantidad; 
     producto->precio= nuevo_precio;
 
-
 }
 
-
-
-
-
-
 // Funciones para las opciones del menú
+
+
+//Imprimir la lista de productos.
 void verInventario(lista_doble * lista_productos) {
     printf("Opcion: Ver Inventario\n"); 
     imprimirListaDProducto(lista_productos);
 }
 
+
+//Actualizar cantidad y precio del producto que el usuario desee.
 void actualizarInventario(lista_doble * lista_productos) {
 
     int id_cambiar=0;
     Producto * producto_cambiar = NULL;
-    
-
+    //Leemos ID para saber qué producto se cambiará. 
     leerEntero("Ingresa la ID del producto que quieres modificar: \n", &id_cambiar); 
     producto_cambiar= buscarNodoPorId(lista_productos, id_cambiar);
 
+    //En caso de que no se encuntre producto con ID solicitada.
     if(producto_cambiar==NULL){
         printf("\n ----NO SE ENCONTRO PRODUCTO CON ESA ID");
         return;
     }
 
+    //Leemos nuevos valores.
     int nueva_cantidad=0; 
-    float nuevo_precio =1; //Aqui duda. Se puede inicializar en 0 o debe de ser 0.0?
+    float nuevo_precio =1; 
 
     printf("\n El producto que quieres cambiar es: \n"); 
     imprimirProducto(*producto_cambiar);
@@ -638,7 +562,6 @@ void actualizarInventario(lista_doble * lista_productos) {
         printf("\n Ingresa la nueva cantidad del producto con ID %d: ", id_cambiar);
         leerEntero("", &nueva_cantidad);
 
-
     }while(nueva_cantidad < 0);
 
 
@@ -649,48 +572,13 @@ void actualizarInventario(lista_doble * lista_productos) {
          printf("\n Ingresa el nuevo precio  del producto con ID %d: ", id_cambiar);
         leerFloat("", &nuevo_precio);
     }while(nuevo_precio <=  0);
-
+    //Actualizamos.
     actualizarProducto(producto_cambiar, nueva_cantidad, nuevo_precio);
 
 }
 
-/*
 
-void quitarProducto(lista_doble * lista_productos){
-    if(listaVacia(lista_productos)){
-        printf("\n--- LA LISTA DE PRODUCTOS ESTA VACIA. NO PUEDES QUITAR PRODUCTOS ---\n");
-        return ; 
-    }
-    int id_quitar=0;
-
-    leerEntero("Ingresa la ID del producto que quieres quitar: \n", &id_quitar);
-
-    nodo_doble * nodo_quitar = extraerEnMedioLDProductos(lista_productos, id_quitar);
-
-    if(nodo_quitar==NULL){
-        printf("\n ---NO HAY PRODUCTO CON ESA ID--- \n");
-        return ;
-
-    }
-
-    Producto * producto_quitar =(Producto *) nodo_quitar->info; 
-
-    printf("El producto que quieres quitar es : \n"); 
-    imprimirProducto(*producto_quitar);
-
-    printf("Presione  dos veces Enter para quitar el producto... ");
-    getchar(); // Pausa la ejecución hasta que el usuario presione Enter
-    // Descartar el carácter de retorno de carro ('\n')
-    getchar();
-
-    free(nodo_quitar->info);
-    free(nodo_quitar);
-
-    printf("\n Se ha eliminado el producto. ");
-}
-
-*/
-
+//Buscar producto en la lista de productos por ID.
 void buscarInventario(lista_doble * lista_productos) {
 
     int idBuscado=0;
@@ -707,10 +595,9 @@ void buscarInventario(lista_doble * lista_productos) {
 }
 
 
-
+//Generar un pedido y agregarlo a la cola de pedidos.
 void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
-    printf("Opcion: Agregar Pedido\n");
-
+    //Si lista de productos está vacía o no hay existencias de ningún producto.
     if(existenciaInventario(lista_productos) == 0){
         printf("\n \n--- Ya no hay existencias de ningun producto \n\n");
         return;
@@ -720,41 +607,41 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
         return;
 
     }
-    char nombre_pedido[50]; 
     int id_producto_pedido=0; 
     int cantidad_producto_pedido=0;
 
+    //El pedido será una lista doble de productos. Como el inventario.
     lista_doble * pedido = crearListaDoble(); 
 
-    fflush(stdin);
-    printf("\n Ingrese el nombre de su pedido: ");
-    fgets(nombre_pedido, sizeof(nombre_pedido), stdin);
+   
 
+    Producto * producto_pedido= NULL; //Producto que se agregará a la lista pedido.
 
-    Producto * producto_pedido= NULL;
-    Producto *  producto_pedido_lista=  (Producto *)lista_productos->head->info ; //Solo es para inicializarlo en algun valor.
+    Producto * producto_pedido_aux = NULL; //Servirá para saber si un producto ya se ha agregado al pedido.
+
+    //Dirección del productos del inventario del cual se quiere añadir al pedido 
+    //Solo es para inicializarlo en algun valor diferente de NULL
+    Producto *  producto_pedido_lista= (Producto *)lista_productos->head->info ; 
 
     int pregunta=1; 
 
     while(pregunta ==1){
 
+        //En cada iteración del ciclo se agregará un producto nuevo.
         if(existenciaInventario(lista_productos) == 0){
             printf("\n\n --- Ya no hay existencias de ningun producto \n\n");
             break;
         }
         
-
+        //Leera ID hasta que se encuentre producto con esa ID.
         do{
             imprimirListaDProducto(lista_productos);
-            imprimirNoExistencia(lista_productos);
+            imprimirNoExistencia(lista_productos); //Funcion para mostrar de qué producto ya no hay existencias.
 
             if(producto_pedido_lista==NULL){
                 printf("\nIngresa un valor valido de ID: ");
             }
 
-            // Añadiremos funcion para que muestre de que productos ya no hay existencia
-
-            
             leerEntero("\n Ingresa el ID del producto que quieres agregar: ", &id_producto_pedido);
             producto_pedido_lista = buscarNodoPorId(lista_productos, id_producto_pedido);  // Producto que se quiere comprar. 
     
@@ -782,13 +669,23 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
 */
         
         if(cantidad_producto_pedido > 0){
+
             producto_pedido_lista->cantidad = producto_pedido_lista->cantidad - cantidad_producto_pedido; //Restamos la cantidad 
 
-            producto_pedido = crearProducto();  // Producto cola es el que se añadirá a cada pedido. 
+            producto_pedido_aux = buscarNodoPorId(pedido, id_producto_pedido);
+            if(producto_pedido_aux != NULL){
+                producto_pedido_aux->cantidad += cantidad_producto_pedido;
 
-            llenarProducto(producto_pedido, producto_pedido_lista->nombre, producto_pedido_lista->precio, cantidad_producto_pedido, id_producto_pedido);
+            }else{
 
-            agregarFinalLD(pedido, producto_pedido);
+                producto_pedido = crearProducto();  // Producto cola es el que se añadirá a cada pedido. 
+
+                llenarProducto(producto_pedido, producto_pedido_lista->nombre, producto_pedido_lista->precio, cantidad_producto_pedido, id_producto_pedido);
+
+                agregarFinalLD(pedido, producto_pedido);
+
+
+            }
 
 
         }
@@ -805,17 +702,17 @@ void agregarPedido(lista_doble * lista_productos, lista_doble * cola_pedidos) {
         return;
     }
 
-    strcpy(pedido->nombre, nombre_pedido);
+    //Imprimimos pedido y lo agregamos a la cola de pedidos.
     printf("\n --- Se ha agregado el pedido ---\n");
-    printf("\n Nombre : %s ", pedido->nombre);
     imprimirListaDProducto(pedido);
     agregarFinalLD(cola_pedidos,pedido);
 }
 
 
-
+//Liberar un pedido de la cola de pedidos para añadirlo a la pila de ventas. 
 void liberarPedido(lista_doble * cola_pedidos, pila_ventas * pila_de_ventas) {
     printf("Opcion: Liberar Pedido\n");
+
 
     if(listaVacia(cola_pedidos)){
 
@@ -826,19 +723,20 @@ void liberarPedido(lista_doble * cola_pedidos, pila_ventas * pila_de_ventas) {
     nodo_doble * nodo_pedido_liberado=NULL;
 
     Venta * venta = (Venta *)malloc(sizeof(Venta));
-
+    //Verificamos que se haya reservado correctamente la memoria.
     if(venta==NULL){
         printf("\n --- No se pudo liberar el pedido --- \n");
         return;
     }
-
+    //extraemo el nodo de inicio de la cola de pedidos.
     nodo_pedido_liberado= extraerInicioLD(cola_pedidos);
-
+    //Recordemos que en el campo info de la cola de pedidos se almacenan listas dobles
     lista_doble * pedido_liberado= (lista_doble *) nodo_pedido_liberado->info;
 
-
+    // En el campo id_pedido de la venta estará la dirección de memoria de la lista doble pedido_liberado.
     venta->id_pedido = pedido_liberado; 
-    venta->total = ObtenerTotalPedido(pedido_liberado);
+    venta->total = ObtenerTotalPedido(pedido_liberado); 
+
 
     int prueba = push(pila_de_ventas, venta);
 
@@ -849,18 +747,17 @@ void liberarPedido(lista_doble * cola_pedidos, pila_ventas * pila_de_ventas) {
 
         return;
     }
-
+    //Imprime el pedido liberado y la venta que se generó. 
     printf("\n --- Se ha liberado el pedido y se ha agregado a la pila de ventas:");
     printf("\n Nombre : %s ", pedido_liberado->nombre); 
     imprimirListaDProducto(pedido_liberado);
     printf("\n Venta: ");
     imprimirVenta(venta);
-    free(nodo_pedido_liberado);
-
+    free(nodo_pedido_liberado); //Se libera la memoria del nodo extraido de cola de pedidos.
 
 }
 
-
+//Registrar una venta y agregarla a la pila de ventas. En esta función se genera un pedido y después a partir de ese pedido se genera la venta
 void registrarVentas(lista_doble * lista_productos, pila_ventas * pila_v) {
 
 
@@ -873,16 +770,13 @@ if(existenciaInventario(lista_productos) == 0){
         return;
     }
 
-char nombre_pedido[50];
 int id_producto_venta = 0;
 int cantidad_producto_venta = 0;
 
-fflush(stdin);
-printf("\nIngrese el nombre del pedido: ");
-fgets(nombre_pedido, sizeof(nombre_pedido), stdin);
 
 lista_doble * venta = crearListaDoble();
 Producto *producto_venta = NULL;
+Producto * producto_venta_auxiliar=NULL;
 Producto *producto_venta_lista = (Producto *)lista_productos->head->info;
 
 int pregunta = 1;
@@ -920,24 +814,36 @@ while (pregunta == 1) {
 
     } while (cantidad_producto_venta > producto_venta_lista->cantidad || cantidad_producto_venta < 0);
 
+    //Se verifica si ya se ha añadido el producto antes, si sí solo se modifica la cantidad en la lista venta y si no se crea un nuevo producto para añadirlo a la venta
     if (cantidad_producto_venta > 0) {
         producto_venta_lista->cantidad -= cantidad_producto_venta; // Restamos la cantidad vendida
-        producto_venta = crearProducto();
-        llenarProducto(producto_venta, producto_venta_lista->nombre, producto_venta_lista->precio, cantidad_producto_venta, id_producto_venta);
-        agregarFinalLD(venta, producto_venta);   
+        producto_venta_auxiliar = buscarNodoPorId(venta, id_producto_venta);
+            
+        if(producto_venta_auxiliar != NULL){
+            producto_venta_auxiliar += cantidad_producto_venta;
+
+        }else{
+            producto_venta = crearProducto();
+            llenarProducto(producto_venta, producto_venta_lista->nombre, producto_venta_lista->precio, cantidad_producto_venta, id_producto_venta);
+            agregarFinalLD(venta, producto_venta);   
+
+        }
+
         
     }
 
     leerEntero("1. Agregar otra venta.\n2. Salir\n", &pregunta);
 }
 
+
+//Puede que se llegue aquí con una venta con ningún producto, entonces se evalua si está vacia. 
 if (listaVacia(venta)) {
     free(venta);
     printf("\n--- No se ha realizado ninguna venta ---\n");
     return;
 }
 
-//Creamos la venta que se agregará a la pila.
+//Creamos la venta que se agregará a la pila y la llenamos.
 Venta * venta_a_pila= (Venta *)malloc(sizeof(Venta)); 
 venta_a_pila->id_pedido=NULL;
 venta_a_pila->total=0;
@@ -945,8 +851,10 @@ venta_a_pila->total=0;
 venta_a_pila->id_pedido = venta;
 venta_a_pila->total = ObtenerTotalPedido(venta);
 
+//Hacemos el push. 
 int prueba= push(pila_v, venta_a_pila);
 
+//Comprobamos que se haya hecho correctamente el push.
 if(prueba == 0){
         printf("\n--- No se pudo agregar la venta --- \n");
         free(venta); 
@@ -954,18 +862,14 @@ if(prueba == 0){
         return;
     }
 
-    printf("\n --- Se ha registrado la venta ---", venta_a_pila->id_pedido);
+//Se registró la venta y se imprime.
+    printf("\n --- Se ha registrado la venta ---");
     imprimirVenta(venta_a_pila);
 
 
 }
 
-
-
-
-
-
-void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_pedidos) {
+void mostrarSubMenuInventario(lista_doble * lista_productos) {
     int opcion=0;
 
     while (1) {
@@ -973,10 +877,9 @@ void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_
         printf("1. Ver Inventario\n");
         printf("2. Actualizar Inventario\n");
         printf("3. Buscar en Inventario\n");
-        printf("4. Agregar pedido\n");
-        printf("5. Volver al Menu Principal\n");
+        printf("4. Volver al Menu Principal\n");
 
-        leerEnteroRango("Ingrese su opcion: ", &opcion, 1, 5);
+        leerEnteroRango("Ingrese su opcion: ", &opcion, 1, 4);
 
         switch (opcion) {
             case 1:
@@ -991,12 +894,8 @@ void mostrarSubMenuInventario(lista_doble * lista_productos, lista_doble * cola_
                 printf("Opcion: Buscar en Inventario\n");
                 buscarInventario(lista_productos);
                 break;
-        
+
             case 4: 
-                    printf("Agregar pedido \n");
-                    agregarPedido(lista_productos, cola_pedidos);
-                    break;
-            case 5: 
                 printf("\nVolviendo al Menu Principal...\n");
                 return;  // Salir de la función y volver al menú principal
 
@@ -1010,22 +909,26 @@ void mostrarSubMenuPedido(lista_doble * cola_pedidos, lista_doble * lista_produc
 
     while (1) {
         printf("\n----- Submenu de Pedido -----\n");
-        printf("1. Liberar Pedido\n");
-        printf("2. Ver Colas de Pedido\n");
-        printf("3. Volver al Menu Principal\n");
-        leerEnteroRango("Ingrese su opcion: ", &opcion, 1, 3);
+        printf("1. Agregar pedido\n");
+        printf("2. Liberar Pedido\n");
+        printf("3. Ver Colas de Pedido\n");
+        printf("4. Volver al Menu Principal\n");
+        leerEnteroRango("Ingrese su opcion: ", &opcion, 1, 4);
 
         switch (opcion) {
-            case 1:
-                printf("Opcion: Liberar Pedido\n");
-                liberarPedido(cola_pedidos, pila_de_ventas);
+            case 1: 
+                printf("\n ---Opcion agregarPedido ---\n");
+                agregarPedido(lista_productos, cola_pedidos);
                 break;
             case 2:
-                printf("Opcion: Ver Colas de Pedido\n");
-                imprimirColaPedidos(cola_pedidos);
-
+                printf("\n --- Opcion: Liberar Pedido ---\n");
+                liberarPedido(cola_pedidos, pila_de_ventas);
                 break;
             case 3:
+                printf("\n ---Opcion: Ver Colas de Pedido ---\n");
+                imprimirColaPedidos(cola_pedidos);
+                break;
+            case 4:
                 printf("\nVolviendo al Menu Principal...\n");
                 return;  // Salir de la función y volver al menú principal
         }
@@ -1072,7 +975,7 @@ void mostrarMenu(lista_doble* lista_productos, lista_doble * cola_pedidos, pila_
 
         switch (opcion) {
             case 1:
-                mostrarSubMenuInventario(lista_productos, cola_pedidos);
+                mostrarSubMenuInventario(lista_productos);
                 break;
             case 2:
                 mostrarSubMenuPedido(cola_pedidos, lista_productos, pila_de_ventas);
@@ -1087,6 +990,7 @@ void mostrarMenu(lista_doble* lista_productos, lista_doble * cola_pedidos, pila_
     }
 }
 
+//Función para leer un etero.
 void leerEntero(char prompt[], int *k){
     int prueba=1;
 
@@ -1103,7 +1007,7 @@ void leerEntero(char prompt[], int *k){
     } while (prueba == 0);
     
 }
-
+//ller un float.
 void leerFloat(char prompt[], float *f){
     int prueba = 1;
 
@@ -1119,20 +1023,13 @@ void leerFloat(char prompt[], float *f){
     } while (prueba == 0);
 }
 
-void leerCadena(char prompt[], char cadena[], int longitud) {
-    printf("%s", prompt);
-    fflush(stdout); // Vaciar el búfer de salida para mostrar el prompt inmediatamente
+/*
 
-    fgets(cadena, longitud, stdin);
-
-    // Eliminar el carácter de nueva línea si está presente
-    int longitudCadena = strlen(cadena);
-    if (longitudCadena > 0 && cadena[longitudCadena - 1] == '\n') {
-        cadena[longitudCadena - 1] = '\0';
-    }
-}
+ Lee un entero en el rango entre min y max. No lee el entero hasta que el entero leido se encuentre en ese rango. Se usará mucho
+ para leer las opciones del menú
 
 
+*/
 void leerEnteroRango(char prompt[], int* k, int min, int max) {
     int prueba = 1;
     printf("%s", prompt);
@@ -1147,8 +1044,14 @@ void leerEnteroRango(char prompt[], int* k, int min, int max) {
     } while (prueba == 0 || *k < min || *k > max);
 }
 
-
+/*Sirve para listas dobles que tengan como nodo una estructura Producto. Retorna el nodo que coincida con el id solicitada. 
+Retorna NULL si no se encontró nodo con la id buscada.
+*/
 Producto * buscarNodoPorId(lista_doble* lista_d, int idBuscado) {
+
+    if(listaVacia(lista_d)){
+        return NULL;
+    }
 
     int id_actual=0;
     Producto * producto=NULL;
@@ -1171,6 +1074,7 @@ Producto * buscarNodoPorId(lista_doble* lista_d, int idBuscado) {
 }
 
 
+//Libera la memoria reservada en una cola de pedidos. Como
 void eliminarColaPedidos(lista_doble * cola_pedidos){
     //Si está vacía entonces lista_d->head es NULL y no entrará al ciclo while. 
     nodo_doble* actual = cola_pedidos->head;
@@ -1181,10 +1085,10 @@ void eliminarColaPedidos(lista_doble * cola_pedidos){
     while (actual != NULL) {
         siguiente = actual->next;
 
-        //pedido = (lista_doble*) actual->info;
-        //eliminarListaD(pedido);
+        pedido = (lista_doble*) actual->info;
+         eliminarListaD(pedido);
 
-        eliminarListaD(actual->info);
+       // eliminarListaD(actual->info);
         free(actual);
         actual = siguiente;
     }
@@ -1243,6 +1147,8 @@ int existenciaInventario(lista_doble * lista_productos){
     return 0;
     
 }
+
+//. Recorre toda la lista de productos e imprime el nombre del producto y su ID de los productos para los cuales no hay existencias.
 
 void imprimirNoExistencia(lista_doble * lista_productos){
 
@@ -1326,6 +1232,7 @@ int isFull(pila_ventas * pila){
     return 0;
 }
 
+//Para ver si la pila está vacía.
 int isEmpty(pila_ventas * pila){
     return pila->tope == -1;
 }
@@ -1336,8 +1243,7 @@ int push(pila_ventas *pila_v, Venta * venta) {
         pila_v->pila = realloc(pila_v->pila, pila_v->max_tamanio * sizeof(Venta *));
     }
 
-    //Verificar que se alla redimensionado.
-
+    //Verifica que se haya redimensionado correctamente
     if(pila_v->pila == NULL){
         printf("\n--- No se pudo registrar otra venta --- \n");
         return 0;
@@ -1349,7 +1255,6 @@ int push(pila_ventas *pila_v, Venta * venta) {
 }
 
 //Imprime una estrutura de venta. 
-
 void imprimirVenta(Venta * venta){
     printf("\n Total de la venta= %.4f", venta->total);
     printf("\n ID del pedido = %p \n", venta->id_pedido);
@@ -1368,6 +1273,7 @@ void imprimirPilaVentas(pila_ventas * pila_v){
     }
 }
 
+// Obtiene el total de todo un pedido al multiplicar la cantidad y el precio de cada producto, para esto recorre todo el pedido.
 float ObtenerTotalPedido(lista_doble * pedido){
 
     if(listaVacia(pedido)){
@@ -1389,6 +1295,7 @@ float ObtenerTotalPedido(lista_doble * pedido){
 
 }
 
+//Liberar memoria de la pila de ventas.
 void eliminarPilaVentas(pila_ventas * pila_de_ventas){
 
     if (isEmpty(pila_de_ventas)) {
@@ -1397,7 +1304,6 @@ void eliminarPilaVentas(pila_ventas * pila_de_ventas){
         return;
     }
 
-    printf("\n Pila de ventas:\n");
     for (int j =pila_de_ventas->tope; j >= 0; j--) {
         eliminarListaD(pila_de_ventas->pila[j]->id_pedido);
         free(pila_de_ventas->pila[j]);    
@@ -1409,38 +1315,6 @@ void eliminarPilaVentas(pila_ventas * pila_de_ventas){
 }
 
 
-
-/*
-void registrar_venta(Ventas* ventas, Producto* producto) {
-    ventas->tope++;
-    if (ventas->tope > ventas->tamano) {
-        ventas->tamano *= 2;
-        ventas->pila = realloc(ventas->pila, ventas->tamano * sizeof(Producto*));
-    }
-    ventas->pila[ventas->tope - 1] = producto;
-    printf("Venta registrada.\n");
-}
-
-
-void ver_ventas_realizadas(Ventas* ventas) {
-    if (ventas->tope == 0) {
-        printf("No se han realizado ventas.\n");
-    } else {
-        printf("Ventas realizadas:\n");
-        for (int i = ventas->tope - 1; i >= 0; i--) {
-            Producto* producto = ventas->pila[i];
-            printf("Nombre: %s\n", producto->nombre);
-            printf("ID: %d\n", producto->id);
-            printf("Precio unitario: %.2f\n", producto->precio);
-            printf("Cantidad: %d\n", producto->cantidad);
-            printf("-------------------------\n");
-        }
-    }
-}
-
-
-
-*/
 
 
  
