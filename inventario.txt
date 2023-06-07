@@ -1,4 +1,20 @@
-Paletas,45612,0.50,10
-Tambores,12345,2.50,10
-Picafresas,668,1.00,10
-Chicles,78945,0.50,10
+Dulce de Leche,11001,10.00,0
+Mazapan,11002,5.00,98
+Cocada,11003,8.00,68
+Alegria,11004,7.00,53
+Paleta de Tamarindo,11005,3.00,174
+Oblea,11006,2.00,83
+Palanqueta,11007,6.00,70
+Ate,11008,9.00,57
+Pulparindo,11009,4.00,89
+Churro,11010,12.00,24
+Cajeta,11011,15.00,26
+Glorias,11012,11.00,15
+Limones Rellenos,11013,7.00,88
+Camotes,11014,6.00,85
+Cocadas Blancas,11015,8.00,58
+Borrachitos,11016,9.00,60
+Glorias de Rompope,11017,10.00,40
+Cacahuate Garapiñado,11018,5.00,110
+Barras de Amaranto,11019,7.00,85
+Mazapanes,11020,4.00,113
